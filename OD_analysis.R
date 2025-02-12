@@ -1,7 +1,9 @@
 # LOAD REQUIRED PACKAGES ------------------------------------------------------
 library(ggplot2)   # For creating publication-quality graphics
 library(dplyr)     # For data manipulation using intuitive syntax
-library(nlme)      # For advanced linear mixed-effects modeling
+library(nlme)  
+library(broom)
+# For advanced linear mixed-effects modeling
 
 # DATA IMPORT AND PREPROCESSING -----------------------------------------------
 # Read raw OD data from CSV file
@@ -56,21 +58,20 @@ corrected_data <- raw_data %>%
   group_by(Treatment, Time) %>%
   mutate(Replicate = row_number())      # Number replicates sequentially (1-3)
 
-# MIXED-EFFECTS STATISTICAL MODEL ---------------------------------------------
-# Model Formula: OD_corrected ~ Time * Treatment + (1 | Replicate)
-# - Fixed Effects: 
-#   * Time: Continuous predictor of growth over time
-#   * Treatment: Categorical predictor (P4_SSE vs Ch5_SSE)
-#   * Interaction Term (Time*Treatment): Tests if growth rates differ between isolates
-# - Random Effect: 
-#   * (1 | Replicate): Accounts for variability between biological replicates
-
-final_model <- lme(
-  fixed = OD_corrected ~ Time * Treatment,  # Specify fixed effects
-  random = ~1 | Replicate,                  # Random intercept per replicate
-  data = corrected_data,                    # Use corrected OD values
-  na.action = na.omit                       # Handle any remaining NAs
-)
+# Perform t-tests at each time point
+ttest_results <- corrected_data %>%
+  group_by(Time) %>%
+  do(tidy(t.test(OD_corrected ~ Treatment, data = .))) %>%
+  select(Time, estimate1, estimate2, p.value) %>%
+  mutate(
+    p.adj = p.adjust(p.value, method = "BH"), # Benjamini-Hochberg correction
+    significance = case_when(
+      p.adj < 0.001 ~ "***",
+      p.adj < 0.01 ~ "**",
+      p.adj < 0.05 ~ "*",
+      TRUE ~ "ns"
+    )
+  )
 
 # MODEL OUTPUT INTERPRETATION -------------------------------------------------
 # Generate ANOVA table to evaluate significance of terms
