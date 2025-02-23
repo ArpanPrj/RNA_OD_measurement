@@ -8,7 +8,7 @@ library(broom)
 # DATA IMPORT AND PREPROCESSING -----------------------------------------------
 # Read raw OD data from CSV file
 # Structure: Each row contains Time (hr), Treatment, and OD_600 measurement
-raw_data <- read.csv("OD_trial1.csv") %>%
+raw_data <- read.csv("OD_trial2.csv") %>%
   # FILTERING STRATEGY:
   # 1. Remove all water controls (not needed for final analysis)
   # 2. Keep SSE (soybean seed extract blank), P4_SSE, and Ch5_SSE
@@ -108,6 +108,11 @@ growth_plot <- ggplot(
   # PLOT ELEMENTS:
   geom_line(linewidth = 1) +        # Main growth curve
   geom_point(size = 2.5) +          # Individual time points
+  geom_errorbar(  # Add error bars
+    aes(ymin = mean_OD - sd_OD, ymax = mean_OD + sd_OD),
+    width = 0.5,
+    alpha = 0.7
+  ) +
  
   # AESTHETIC CUSTOMIZATIONS:
   labs(
