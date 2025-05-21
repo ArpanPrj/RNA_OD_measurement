@@ -8,11 +8,11 @@ library(broom)
 # DATA IMPORT AND PREPROCESSING -----------------------------------------------
 # Read raw OD data from CSV file
 # Structure: Each row contains Time (hr), Treatment, and OD_600 measurement
-raw_data <- read.csv("OD_trial2.csv") %>%
+raw_data <- read.csv("OD_trial3.csv") %>%
   # FILTERING STRATEGY:
   # 1. Remove all water controls (not needed for final analysis)
   # 2. Keep SSE (soybean seed extract blank), P4_SSE, and Ch5_SSE
-  filter(Treatment %in% c("SSE", "P4_SSE", "Ch5_SSE")) %>%
+  filter(Treatment %in% c("SSE","Ch5_SSE","P4_SSE")) %>%
   
   # DATA TYPE CONVERSIONS:
   # - Convert Time from factor to numeric for modeling

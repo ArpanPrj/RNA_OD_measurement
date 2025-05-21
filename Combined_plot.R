@@ -19,8 +19,8 @@ combined_data <- bind_rows(data1, data2, data3) %>%
     Time = as.numeric(as.character(Time)),
     Treatment = factor(Treatment),
     Trial = factor(Trial)
-  ) %>%
-  filter(Time <= 22)  # ⬅️ Only use time points ≤ 22
+  )
+  #filter(Time <= 22)  # ⬅️ Only use time points ≤ 22
 
 # BLANK CORRECTION ------------------------------------------------------------
 sse_means <- combined_data %>%
